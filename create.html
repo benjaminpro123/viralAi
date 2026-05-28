@@ -501,13 +501,26 @@
               <div class="relative z-10 w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-all hover:scale-110 transform">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="white" style="margin-left:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               </div>
-              <!-- Overlay text -->
-              <div class="absolute bottom-4 left-4 right-4">
-                <div class="text-xs text-white/60 mb-1">PREVIEW</div>
-                <div class="text-white font-bold text-sm" id="resultTitle">Your Viral Video</div>
+              <!-- Caption overlay -->
+              <div id="captionBox" class="absolute bottom-0 left-0 right-0 z-20 px-4 pb-4 pt-8 text-center"
+                style="background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 100%);display:none">
+                <p id="captionText" class="text-white font-bold text-base leading-snug drop-shadow-lg"
+                  style="font-family:'Syne',sans-serif;text-shadow:0 2px 8px rgba(0,0,0,0.8)"></p>
+              </div>
+              <!-- Music indicator -->
+              <div id="musicBadge" class="absolute top-3 left-3 glass px-2 py-1 rounded-lg flex items-center gap-1.5 z-20" style="display:none">
+                <div class="flex items-end gap-0.5 h-3">
+                  <div style="width:2px;background:#a78bfa;border-radius:2px;animation:wave 0.8s ease-in-out infinite;animation-delay:0s;height:4px"></div>
+                  <div style="width:2px;background:#a78bfa;border-radius:2px;animation:wave 0.8s ease-in-out infinite;animation-delay:0.15s;height:8px"></div>
+                  <div style="width:2px;background:#a78bfa;border-radius:2px;animation:wave 0.8s ease-in-out infinite;animation-delay:0.3s;height:12px"></div>
+                  <div style="width:2px;background:#a78bfa;border-radius:2px;animation:wave 0.8s ease-in-out infinite;animation-delay:0.15s;height:8px"></div>
+                </div>
+                <span class="text-xs text-white/70" id="musicLabel">Music</span>
               </div>
               <!-- Duration badge -->
-              <div class="absolute top-4 right-4 glass px-2 py-1 rounded text-xs text-white/70" id="resultDuration">00:30</div>
+              <div class="absolute top-3 right-3 glass px-2 py-1 rounded text-xs text-white/70" id="resultDuration">00:30</div>
+              <!-- Title -->
+              <div class="absolute" style="display:none" id="resultTitle"></div>
             </div>
 
             <!-- Card body -->
@@ -565,6 +578,61 @@
 </main>
 
 <script>
+  // ── Musik per genre ──
+  const musicTracks = {
+    hiphop:     'https://assets.mixkit.co/music/preview/mixkit-rap-beat-379.mp3',
+    electronic: 'https://assets.mixkit.co/music/preview/mixkit-driving-ambition-32.mp3',
+    lofi:       'https://assets.mixkit.co/music/preview/mixkit-life-is-a-dream-837.mp3',
+    cinematic:  'https://assets.mixkit.co/music/preview/mixkit-cinematic-mystery-suspense-681.mp3',
+  };
+  const musicNames = { hiphop:'Hip-Hop Beat', electronic:'Electronic', lofi:'Lo-Fi Chill', cinematic:'Cinematic' };
+
+  let audioEl = null;
+  let captionTimer = null;
+
+  function startMusic(genre) {
+    if (audioEl) { audioEl.pause(); audioEl = null; }
+    const src = musicTracks[genre] || musicTracks.hiphop;
+    audioEl = new Audio(src);
+    audioEl.volume = 0.35;
+    audioEl.loop = true;
+    audioEl.play().catch(() => {});
+    document.getElementById('musicBadge').style.display = 'flex';
+    document.getElementById('musicLabel').textContent = musicNames[genre] || 'Music';
+  }
+
+  function startCaptions(script) {
+    const box  = document.getElementById('captionBox');
+    const text = document.getElementById('captionText');
+    // Extrahera bara textrader (hoppa över [SECTION]-rubriker och tomma rader)
+    const lines = script.split('\n')
+      .map(l => l.trim())
+      .filter(l => l && !l.startsWith('[') && !l.startsWith('Point'));
+    if (!lines.length) return;
+    box.style.display = 'block';
+    let i = 0;
+    function showNext() {
+      text.style.opacity = '0';
+      text.style.transform = 'translateY(8px)';
+      text.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      setTimeout(() => {
+        text.textContent = lines[i % lines.length];
+        text.style.opacity = '1';
+        text.style.transform = 'translateY(0)';
+        i++;
+      }, 400);
+    }
+    showNext();
+    captionTimer = setInterval(showNext, 3500);
+  }
+
+  function stopMediaAndCaptions() {
+    if (audioEl) { audioEl.pause(); audioEl = null; }
+    if (captionTimer) { clearInterval(captionTimer); captionTimer = null; }
+    document.getElementById('captionBox').style.display = 'none';
+    document.getElementById('musicBadge').style.display = 'none';
+  }
+
   // ── Pexels API (gratis nyckel från pexels.com/api) ──
   const PEXELS_API_KEY = 'qR5KMsVNxwK926d1Brq0SCEY2LBlyhn7uWJkVxSS7A6taALSedlK0sO1';
 
@@ -874,17 +942,24 @@ The twist? Coming back felt worse than leaving.
     const mins   = Math.floor(parseInt(s.duration)/60);
     const secs   = parseInt(s.duration) % 60;
 
+    // Stoppa eventuell tidigare musik/captions
+    stopMediaAndCaptions();
+
     // Visa riktig video eller fallback-thumbnail
     const thumbEl = document.getElementById('videoThumb');
     if (videoUrl) {
       thumbEl.innerHTML = `
         <video src="${videoUrl}" autoplay muted loop playsinline
-          style="width:100%;height:100%;object-fit:cover;border-radius:0">
+          style="width:100%;height:100%;object-fit:cover;border-radius:0;position:absolute;inset:0;width:100%;height:100%">
         </video>`;
     }
 
     document.getElementById('resultTitle').textContent = s.topic.length > 40 ? s.topic.slice(0,40)+'…' : s.topic;
     document.getElementById('resultDuration').textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+
+    // Starta musik och captions
+    startMusic(s.music);
+    if (s.script) startCaptions(s.script);
 
     const views = (Math.floor(Math.random()*900+100)).toLocaleString() + 'K–' + (Math.floor(Math.random()*5+1)) + 'M';
     const score = Math.floor(Math.random()*15+82) + '/100';
@@ -916,7 +991,7 @@ The twist? Coming back felt worse than leaving.
     }, 2000);
   }
 
-  function createNew() { window.location.reload(); }
+  function createNew() { stopMediaAndCaptions(); window.location.reload(); }
 </script>
 </body>
 </html>
