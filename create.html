@@ -494,7 +494,7 @@
         <div id="resultSection" class="hidden result-card">
           <div class="border border-violet-500/30 rounded-2xl overflow-hidden" style="box-shadow:0 0 40px rgba(124,58,237,0.2)">
             <!-- Video thumbnail mock -->
-            <div class="relative aspect-video bg-gradient-to-br from-violet-900 to-cyan-900 flex items-center justify-center overflow-hidden">
+            <div id="videoThumb" class="relative aspect-video bg-gradient-to-br from-violet-900 to-cyan-900 flex items-center justify-center overflow-hidden">
               <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(124,58,237,0.6) 0%,rgba(6,182,212,0.4) 100%)"></div>
               <div class="absolute inset-0" style="background-image:radial-gradient(circle at 30% 60%,rgba(255,255,255,0.08) 0%,transparent 60%)"></div>
               <!-- Play button -->
@@ -565,6 +565,24 @@
 </main>
 
 <script>
+  // ── Pexels API (gratis nyckel från pexels.com/api) ──
+  const PEXELS_API_KEY = 'DIN_NYCKEL_HÄR';
+
+  async function fetchPexelsVideo(topic) {
+    try {
+      const res = await fetch(
+        `https://api.pexels.com/videos/search?query=${encodeURIComponent(topic)}&per_page=5&orientation=portrait`,
+        { headers: { Authorization: PEXELS_API_KEY } }
+      );
+      const data = await res.json();
+      if (!data.videos || !data.videos.length) return null;
+      const video = data.videos[0];
+      const file = video.video_files.find(f => f.width <= 720 && f.height >= 720)
+                || video.video_files[0];
+      return file ? file.link : null;
+    } catch (e) { return null; }
+  }
+
   // ── State ──
   const state = {
     step: 1,
@@ -802,7 +820,7 @@ The twist? Coming back felt worse than leaving.
     'Almost there…',
   ];
 
-  function startGeneration() {
+  async function startGeneration() {
     document.getElementById('generateSection').classList.add('hidden');
     document.getElementById('backBtn4').classList.add('hidden');
     document.getElementById('loadingSection').classList.remove('hidden');
@@ -811,10 +829,7 @@ The twist? Coming back felt worse than leaving.
     const pct   = document.getElementById('loadingPct');
     const label = document.getElementById('loadingLabel');
 
-    // Reset bar
-    bar.style.animation = 'none';
-    bar.offsetHeight; // reflow
-    bar.style.animation = '';
+    bar.style.width = '0%';
 
     const steps = [0,15,30,55,72,88,95,100];
     const msgs  = [
@@ -827,18 +842,26 @@ The twist? Coming back felt worse than leaving.
       'Almost there…',
       'Done!',
     ];
+
+    // Hämta video från Pexels parallellt med loading-animationen
+    const videoPromise = fetchPexelsVideo(state.topic);
+
     let idx = 0;
-    const iv = setInterval(() => {
-      if (idx >= steps.length) { clearInterval(iv); showResult(); return; }
-      const p = steps[idx];
-      bar.style.width = p + '%';
-      pct.textContent = p + '%';
-      label.textContent = msgs[idx] || msgs[msgs.length-1];
-      idx++;
-    }, 480);
+    await new Promise(resolve => {
+      const iv = setInterval(() => {
+        if (idx >= steps.length) { clearInterval(iv); resolve(); return; }
+        bar.style.width = steps[idx] + '%';
+        pct.textContent = steps[idx] + '%';
+        label.textContent = msgs[idx] || msgs[msgs.length-1];
+        idx++;
+      }, 480);
+    });
+
+    const videoUrl = await videoPromise;
+    showResult(videoUrl);
   }
 
-  function showResult() {
+  function showResult(videoUrl) {
     document.getElementById('loadingSection').classList.add('hidden');
     const rs = document.getElementById('resultSection');
     rs.classList.remove('hidden');
@@ -851,10 +874,18 @@ The twist? Coming back felt worse than leaving.
     const mins   = Math.floor(parseInt(s.duration)/60);
     const secs   = parseInt(s.duration) % 60;
 
+    // Visa riktig video eller fallback-thumbnail
+    const thumbEl = document.getElementById('videoThumb');
+    if (videoUrl) {
+      thumbEl.innerHTML = `
+        <video src="${videoUrl}" autoplay muted loop playsinline
+          style="width:100%;height:100%;object-fit:cover;border-radius:0">
+        </video>`;
+    }
+
     document.getElementById('resultTitle').textContent = s.topic.length > 40 ? s.topic.slice(0,40)+'…' : s.topic;
     document.getElementById('resultDuration').textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
 
-    // Random but plausible stats
     const views = (Math.floor(Math.random()*900+100)).toLocaleString() + 'K–' + (Math.floor(Math.random()*5+1)) + 'M';
     const score = Math.floor(Math.random()*15+82) + '/100';
     const eng   = (Math.random()*3+4).toFixed(1) + '%';
