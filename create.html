@@ -889,6 +889,9 @@ The twist? Coming back felt worse than leaving.
   ];
 
   async function startGeneration() {
+    // Starta musik direkt vid knapptryckning (måste ske inom user-gesture)
+    startMusic(state.music);
+
     document.getElementById('generateSection').classList.add('hidden');
     document.getElementById('backBtn4').classList.add('hidden');
     document.getElementById('loadingSection').classList.remove('hidden');
@@ -963,8 +966,7 @@ The twist? Coming back felt worse than leaving.
     document.getElementById('resultTitle').textContent = s.topic.length > 40 ? s.topic.slice(0,40)+'…' : s.topic;
     document.getElementById('resultDuration').textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
 
-    // Starta musik och captions
-    startMusic(s.music);
+    // Starta captions
     if (s.script) startCaptions(s.script);
 
     const views = (Math.floor(Math.random()*900+100)).toLocaleString() + 'K–' + (Math.floor(Math.random()*5+1)) + 'M';
