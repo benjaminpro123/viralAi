@@ -973,6 +973,22 @@ The twist? Coming back felt worse than leaving.
     const score = Math.floor(Math.random()*15+82) + '/100';
     const eng   = (Math.random()*3+4).toFixed(1) + '%';
 
+    // Spara till localStorage så videon syns på My Videos
+    saveVideoToLibrary({
+      id: Date.now(),
+      title: s.topic,
+      platform: s.platform,
+      duration: s.duration + 's',
+      style: styleLabels[s.style],
+      voice: voiceLabels[s.voice],
+      videoUrl: videoUrl || '',
+      views: '0', likes: '0', comments: '0', shares: '0',
+      score: parseInt(score),
+      status: 'published',
+      caption: `${s.topic} 🔥 #${s.platform} #viral #fyp`,
+      daysAgo: 0,
+    });
+
     document.getElementById('resultViews').textContent = views;
     document.getElementById('resultScore').textContent = score;
     document.getElementById('resultEngagement').textContent = eng;
@@ -1000,6 +1016,12 @@ The twist? Coming back felt worse than leaving.
   }
 
   function createNew() { stopMediaAndCaptions(); window.location.reload(); }
+
+  function saveVideoToLibrary(video) {
+    const existing = JSON.parse(localStorage.getItem('viralai_videos') || '[]');
+    existing.unshift(video); // lägg till senast skapade först
+    localStorage.setItem('viralai_videos', JSON.stringify(existing));
+  }
 </script>
 </body>
 </html>

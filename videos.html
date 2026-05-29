@@ -403,9 +403,10 @@
       <div class="vid-card" data-id="${v.id}" style="animation-delay:${i * 0.05}s">
         <!-- Thumbnail -->
         <div class="relative aspect-[9/14] bg-gradient-to-br ${v.gradient} flex items-center justify-center overflow-hidden">
+          ${v.videoUrl ? `<video src="${v.videoUrl}" muted loop playsinline autoplay style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;"></video>` : ''}
           <!-- Fake background texture -->
-          <div class="absolute inset-0" style="background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.07),transparent 60%)"></div>
-          <div class="absolute inset-0" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.6) 100%)"></div>
+          <div class="absolute inset-0" style="background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.07),transparent 60%);z-index:1"></div>
+          <div class="absolute inset-0" style="background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.6) 100%);z-index:1"></div>
 
           <!-- Platform icon -->
           <div class="absolute top-3 left-3 glass px-2 py-1 rounded-lg flex items-center gap-1.5">
@@ -623,6 +624,24 @@
     clearTimeout(t._timer);
     t._timer = setTimeout(() => t.classList.remove('show'), 2500);
   }
+
+  // Lägg till videos från localStorage (skapade av användaren) överst
+  function loadUserVideos() {
+    const saved = JSON.parse(localStorage.getItem('viralai_videos') || '[]');
+    saved.forEach((v, i) => {
+      // Fyll i saknade fält med defaults
+      if (!v.gradient) v.gradient = 'from-violet-900 to-cyan-900';
+      if (!v.accent)   v.accent   = '#7c3aed';
+      VIDEOS.unshift(v);
+    });
+  }
+  loadUserVideos();
+
+  // Uppdatera räknaren
+  const userCount = JSON.parse(localStorage.getItem('viralai_videos') || '[]').length;
+  const total = VIDEOS.length;
+  document.querySelector('p.text-white\\/40').textContent =
+    `${total} videos · ${(4.2 + userCount * 0.1).toFixed(1)}M total views`;
 
   // Initial render
   renderGrid(VIDEOS);
