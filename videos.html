@@ -650,12 +650,6 @@
   }
   loadUserVideos();
 
-  // Uppdatera räknaren
-  const userCount = JSON.parse(localStorage.getItem('viralai_videos') || '[]').length;
-  const total = VIDEOS.length;
-  document.querySelector('p.text-white\\/40').textContent =
-    `${total} videos · ${(4.2 + userCount * 0.1).toFixed(1)}M total views`;
-
   // Initial render
   renderGrid(VIDEOS);
 
