@@ -490,6 +490,9 @@
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                   Generate
                 </a>`}
+            <button onclick="deleteVideo(${v.id},event)" class="glass text-red-400/70 hover:text-red-400 text-xs py-2 px-3 rounded-lg transition-colors border border-white/8 hover:border-red-500/30" title="Radera">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
             <div class="relative">
               <button onclick="toggleMenu(${v.id},event)" class="glass text-white/50 hover:text-white text-xs py-2 px-3 rounded-lg transition-colors border border-white/8 hover:border-white/20">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
@@ -609,6 +612,13 @@
 
   function deleteVideo(id, e) {
     e && e.stopPropagation();
+
+    // Ta bort från localStorage om det är en sparad video
+    const saved = JSON.parse(localStorage.getItem('viralai_videos') || '[]');
+    const filtered = saved.filter(v => v.id !== id);
+    localStorage.setItem('viralai_videos', JSON.stringify(filtered));
+
+    // Ta bort kortet från skärmen med animation
     const card = document.querySelector(`[data-id="${id}"]`);
     if (card) {
       card.style.transition = 'opacity 0.3s, transform 0.3s';
@@ -616,7 +626,7 @@
       card.style.transform = 'scale(0.9)';
       setTimeout(() => card.remove(), 300);
     }
-    showToast('Video deleted');
+    showToast('Video raderad');
     if (openMenu) { openMenu.classList.remove('open'); openMenu = null; }
   }
 
