@@ -3,46 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ViralAI – Create Your Viral Video</title>
-  <meta name="description" content="Create AI-powered short videos for TikTok, YouTube Shorts and Instagram Reels in seconds." />
+  <title>ViralAI – Create Your Video</title>
+  <meta name="description" content="Describe your video and let AI create it instantly." />
   <meta name="theme-color" content="#7c3aed" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c3aed'/><text y='.9em' font-size='70' x='15'>V</text></svg>" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { syne: ['Syne','sans-serif'], dm: ['DM Sans','sans-serif'] },
-          animation: {
-            'gradient-x': 'gradient-x 6s ease infinite',
-            'fade-up': 'fade-up 0.5s ease forwards',
-            'fade-in': 'fade-in 0.3s ease forwards',
-            'progress': 'progress 1.8s ease-in-out forwards',
-            'bounce-in': 'bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards',
-          },
-          keyframes: {
-            'gradient-x': { '0%,100%': {'background-position':'0% 50%'}, '50%': {'background-position':'100% 50%'} },
-            'fade-up':   { from:{opacity:'0',transform:'translateY(20px)'}, to:{opacity:'1',transform:'translateY(0)'} },
-            'fade-in':   { from:{opacity:'0'}, to:{opacity:'1'} },
-            'progress':  { from:{width:'0%'}, to:{width:'100%'} },
-            'bounce-in': { from:{opacity:'0',transform:'scale(0.8)'}, to:{opacity:'1',transform:'scale(1)'} },
-          },
-        },
-      },
-    }
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     body { background:#000; font-family:'DM Sans',sans-serif; color:#fff; overflow-x:hidden; }
-    h1,h2,h3,h4 { font-family:'Syne',sans-serif; }
+    h1,h2 { font-family:'Syne',sans-serif; }
 
     .glass {
       background:rgba(255,255,255,0.04);
       border:1px solid rgba(255,255,255,0.08);
       backdrop-filter:blur(20px);
-      -webkit-backdrop-filter:blur(20px);
     }
     .grad-text {
       background:linear-gradient(135deg,#a78bfa,#22d3ee);
@@ -50,542 +24,165 @@
     }
     .grad-btn {
       background:linear-gradient(135deg,#7c3aed,#06b6d4);
-      transition:transform 0.2s ease, box-shadow 0.2s ease;
+      transition:transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     }
-    .grad-btn:hover { transform:translateY(-2px); box-shadow:0 0 28px rgba(139,92,246,0.5); }
-    .grad-btn:active { transform:translateY(0); }
+    .grad-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 0 32px rgba(139,92,246,0.5); }
+    .grad-btn:disabled { opacity:0.5; cursor:not-allowed; }
 
-    .orb { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; opacity:0.3; }
-    .orb-violet { background:radial-gradient(circle,#7c3aed,transparent 70%); }
-    .orb-cyan   { background:radial-gradient(circle,#06b6d4,transparent 70%); }
+    .orb { position:fixed; border-radius:50%; filter:blur(100px); pointer-events:none; z-index:0; }
 
-    /* Step indicator */
-    .step-dot {
-      width:36px; height:36px; border-radius:50%;
-      display:flex; align-items:center; justify-content:center;
-      font-weight:700; font-size:0.85rem; font-family:'Syne',sans-serif;
-      transition:all 0.3s ease;
-      position:relative; z-index:10;
-    }
-    .step-dot.active   { background:linear-gradient(135deg,#7c3aed,#06b6d4); box-shadow:0 0 20px rgba(124,58,237,0.6); }
-    .step-dot.done     { background:linear-gradient(135deg,#5b21b6,#0e7490); }
-    .step-dot.inactive { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.3); }
-
-    .step-connector { height:2px; flex:1; transition:background 0.4s ease; }
-    .step-connector.done   { background:linear-gradient(90deg,#7c3aed,#06b6d4); }
-    .step-connector.inactive { background:rgba(255,255,255,0.08); }
-
-    /* Option cards */
-    .opt-card {
-      cursor:pointer; border-radius:16px; padding:16px;
-      border:2px solid transparent; background:rgba(255,255,255,0.04);
-      transition:all 0.25s ease; position:relative; overflow:hidden;
-    }
-    .opt-card::before {
-      content:''; position:absolute; inset:0; opacity:0;
-      background:linear-gradient(135deg,rgba(124,58,237,0.12),rgba(6,182,212,0.06));
-      transition:opacity 0.25s ease;
-    }
-    .opt-card:hover { border-color:rgba(167,139,250,0.4); transform:translateY(-2px); }
-    .opt-card:hover::before { opacity:1; }
-    .opt-card.selected { border-color:#7c3aed; background:rgba(124,58,237,0.12); }
-    .opt-card.selected::before { opacity:1; }
-    .opt-card.selected .check-ring { border-color:#7c3aed; background:#7c3aed; }
-
-    .check-ring {
-      width:20px; height:20px; border-radius:50%;
-      border:2px solid rgba(255,255,255,0.2);
-      display:flex; align-items:center; justify-content:center;
-      transition:all 0.2s ease; flex-shrink:0;
-    }
-    .check-ring svg { opacity:0; transition:opacity 0.2s; }
-    .opt-card.selected .check-ring svg { opacity:1; }
-
-    /* Textarea */
-    textarea, input[type=text] {
+    textarea {
       background:rgba(255,255,255,0.04);
-      border:1px solid rgba(255,255,255,0.1);
-      border-radius:12px; color:#fff; font-family:'DM Sans',sans-serif;
+      border:1.5px solid rgba(255,255,255,0.1);
+      border-radius:16px; color:#fff;
+      font-family:'DM Sans',sans-serif; font-size:1rem;
       outline:none; resize:none; width:100%;
-      transition:border-color 0.2s ease, box-shadow 0.2s ease;
+      transition:border-color 0.25s, box-shadow 0.25s;
     }
-    textarea:focus, input[type=text]:focus {
+    textarea:focus {
       border-color:#7c3aed;
-      box-shadow:0 0 0 3px rgba(124,58,237,0.15);
+      box-shadow:0 0 0 4px rgba(124,58,237,0.12);
     }
-    textarea::placeholder, input::placeholder { color:rgba(255,255,255,0.25); }
+    textarea::placeholder { color:rgba(255,255,255,0.2); }
 
-    /* Script box */
-    .script-box {
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.07);
-      border-radius:16px; padding:20px;
-      font-size:0.9rem; line-height:1.7;
-      color:rgba(255,255,255,0.8);
-      white-space:pre-wrap;
-    }
+    /* Loading dots */
+    @keyframes dot { 0%,80%,100%{transform:scale(0);opacity:0} 40%{transform:scale(1);opacity:1} }
+    .dot { width:8px; height:8px; border-radius:50%; background:#a78bfa; animation:dot 1.4s ease-in-out infinite; }
+    .dot:nth-child(2) { animation-delay:0.16s; }
+    .dot:nth-child(3) { animation-delay:0.32s; }
 
-    /* Loading bar */
-    @keyframes loading-bar {
-      0%   { width:0%;   background-position:0% 50%; }
-      60%  { width:80%;  background-position:60% 50%; }
-      90%  { width:92%;  background-position:90% 50%; }
-      100% { width:100%; background-position:100% 50%; }
-    }
-    .loading-bar {
-      height:100%; border-radius:999px;
-      background:linear-gradient(90deg,#7c3aed,#06b6d4,#a78bfa,#22d3ee);
-      background-size:200% 100%;
-      width:0%;
-      transition:width 0.4s ease;
-    }
-    @keyframes loading-bar-indeterminate {
-      0%   { left:-40%; width:40%; }
-      100% { left:110%; width:40%; }
-    }
+    /* Fade in */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp 0.5s ease forwards; }
 
-    /* Result card */
-    .result-card { animation:bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+    /* Video result */
+    #resultBox { display:none; }
+    #resultBox.show { display:block; animation:fadeUp 0.5s ease forwards; }
 
-    /* Tags */
-    .tag {
-      display:inline-block; padding:4px 12px; border-radius:999px; font-size:0.75rem;
-      background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.6);
+    /* Suggestion chips */
+    .chip {
+      padding:6px 14px; border-radius:999px; font-size:0.8rem;
+      border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04);
+      cursor:pointer; transition:all 0.2s ease; color:rgba(255,255,255,0.55);
+      white-space:nowrap;
     }
-    .tag-violet { background:rgba(124,58,237,0.15); border-color:rgba(124,58,237,0.3); color:#a78bfa; }
-    .tag-cyan   { background:rgba(6,182,212,0.12);  border-color:rgba(6,182,212,0.3);  color:#22d3ee; }
-    .tag-pink   { background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.3); color:#f472b6; }
+    .chip:hover { border-color:rgba(167,139,250,0.5); color:#fff; background:rgba(124,58,237,0.1); }
 
     nav a { font-family:'DM Sans',sans-serif; }
+    .nav-link { position:relative; }
     .nav-link::after {
       content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px;
       background:linear-gradient(90deg,#a78bfa,#22d3ee); transition:width 0.3s ease;
     }
-    .nav-link { position:relative; }
     .nav-link:hover::after { width:100%; }
-
-    /* Waveform decoration */
-    .wave-bar {
-      width:3px; border-radius:3px;
-      background:linear-gradient(to top,#7c3aed,#22d3ee);
-    }
-    @keyframes wave {
-      0%,100% { transform:scaleY(0.3); }
-      50%      { transform:scaleY(1); }
-    }
-
-    /* Typing cursor animation */
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-    .cursor { display:inline-block; width:2px; height:1em; background:#a78bfa; vertical-align:middle; animation:blink 1s infinite; margin-left:2px; }
-
-    .step-panel { display:none; }
-    .step-panel.active { display:block; animation:fade-up 0.4s ease forwards; }
   </style>
 </head>
 <body>
 
+<!-- BG Orbs -->
+<div class="orb" style="width:600px;height:600px;background:radial-gradient(circle,#7c3aed,transparent 70%);opacity:0.2;top:-150px;left:-150px;"></div>
+<div class="orb" style="width:500px;height:500px;background:radial-gradient(circle,#06b6d4,transparent 70%);opacity:0.15;bottom:-100px;right:-100px;"></div>
+<div class="fixed inset-0 pointer-events-none" style="background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:60px 60px;z-index:0"></div>
+
 <!-- NAV -->
 <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
-  <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+  <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
     <a href="index.html" class="flex items-center gap-2">
       <div class="w-8 h-8 rounded-lg grad-btn flex items-center justify-center text-white font-bold text-sm" style="font-family:Syne,sans-serif">V</div>
       <span class="font-bold text-lg grad-text" style="font-family:Syne,sans-serif">ViralAI</span>
     </a>
     <div class="hidden md:flex items-center gap-8">
-      <a href="index.html"  class="nav-link text-white/70 hover:text-white text-sm transition-colors">Home</a>
-      <a href="create.html" class="nav-link text-white text-sm transition-colors">Create</a>
-      <a href="videos.html" class="nav-link text-white/70 hover:text-white text-sm transition-colors">My Videos</a>
+      <a href="index.html"  class="nav-link text-white/60 hover:text-white text-sm transition-colors">Home</a>
+      <a href="create.html" class="nav-link text-white text-sm">Create</a>
+      <a href="videos.html" class="nav-link text-white/60 hover:text-white text-sm transition-colors">My Videos</a>
     </div>
-    <a href="videos.html" class="glass text-white/70 hover:text-white text-sm font-medium px-5 py-2 rounded-full border border-white/10 hover:border-white/20 transition-all">
+    <a href="videos.html" class="glass text-white/60 hover:text-white text-sm px-4 py-2 rounded-full border border-white/10 hover:border-white/20 transition-all">
       My Videos
     </a>
   </div>
 </nav>
 
-<!-- BG orbs -->
-<div class="orb orb-violet w-[500px] h-[500px] fixed" style="top:-100px;left:-150px;opacity:0.2;pointer-events:none;z-index:0"></div>
-<div class="orb orb-cyan   w-[400px] h-[400px] fixed" style="bottom:-100px;right:-100px;opacity:0.15;pointer-events:none;z-index:0"></div>
-<div class="fixed inset-0 pointer-events-none" style="background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:60px 60px;z-index:0"></div>
-
 <!-- MAIN -->
-<main class="relative z-10 pt-24 pb-20 min-h-screen">
-  <div class="max-w-3xl mx-auto px-6">
+<main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-20">
+  <div class="w-full max-w-2xl">
 
     <!-- Header -->
-    <div class="text-center mb-12">
-      <h1 class="text-4xl sm:text-5xl font-extrabold mb-3">Create a <span class="grad-text">Viral Video</span></h1>
-      <p class="text-white/50">Follow the steps below to generate your AI-powered short</p>
+    <div class="text-center mb-10 fade-up">
+      <h1 class="text-4xl sm:text-6xl font-extrabold mb-4">
+        Describe your<br/><span class="grad-text">AI video</span>
+      </h1>
+      <p class="text-white/50 text-lg">Tell us what you want — we'll create it instantly.</p>
     </div>
 
-    <!-- Step Indicator -->
-    <div class="flex items-center mb-12 px-2">
-      <div id="dot1" class="step-dot active">1</div>
-      <div id="con1" class="step-connector inactive mx-1"></div>
-      <div id="dot2" class="step-dot inactive">2</div>
-      <div id="con2" class="step-connector inactive mx-1"></div>
-      <div id="dot3" class="step-dot inactive">3</div>
-      <div id="con3" class="step-connector inactive mx-1"></div>
-      <div id="dot4" class="step-dot inactive">4</div>
-    </div>
-    <!-- Step labels -->
-    <div class="flex justify-between text-xs text-white/30 mb-10 px-0">
-      <span class="w-9 text-center" id="lbl1" style="color:rgba(167,139,250,0.9)">Platform</span>
-      <span class="w-9 text-center" id="lbl2">Script</span>
-      <span class="w-9 text-center" id="lbl3">Style</span>
-      <span class="w-9 text-center" id="lbl4">Generate</span>
-    </div>
+    <!-- Input area -->
+    <div class="fade-up" style="animation-delay:0.1s;opacity:0">
+      <textarea
+        id="promptInput"
+        rows="4"
+        placeholder="e.g. A cinematic video of a person meditating at sunrise on a mountain, calm and peaceful…"
+        class="px-5 py-4 mb-4 text-base"
+      ></textarea>
 
-    <!-- ─── STEP 1: Platform ─── -->
-    <div id="step1" class="step-panel active">
-      <div class="glass rounded-3xl p-8 border border-white/8">
-        <h2 class="text-2xl font-bold mb-2">Choose Your Platform</h2>
-        <p class="text-white/50 mb-8 text-sm">Where will your video go viral?</p>
-
-        <div class="grid sm:grid-cols-3 gap-4 mb-8">
-          <!-- YouTube -->
-          <div class="opt-card platform-opt" data-val="youtube" onclick="selectPlatform(this)">
-            <div class="flex justify-between items-start mb-4">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,0,0,0.15)">
-                <svg width="22" height="16" viewBox="0 0 22 16" fill="#FF0000"><path d="M21.54 2.5A2.77 2.77 0 0 0 19.58.5C17.88 0 11 0 11 0S4.12 0 2.42.5A2.77 2.77 0 0 0 .46 2.5C0 4.22 0 8 0 8s0 3.78.46 5.5A2.77 2.77 0 0 0 2.42 15.5C4.12 16 11 16 11 16s6.88 0 8.58-.5a2.77 2.77 0 0 0 1.96-2C22 11.78 22 8 22 8s0-3.78-.46-5.5zM8.75 11.5v-7L14.5 8l-5.75 3.5z"/></svg>
-              </div>
-              <div class="check-ring"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            </div>
-            <div class="font-semibold text-sm mb-1">YouTube Shorts</div>
-            <div class="text-white/40 text-xs">9:16 · Up to 60s</div>
-          </div>
-          <!-- TikTok -->
-          <div class="opt-card platform-opt selected" data-val="tiktok" onclick="selectPlatform(this)">
-            <div class="flex justify-between items-start mb-4">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.08)">
-                <svg width="18" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>
-              </div>
-              <div class="check-ring"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            </div>
-            <div class="font-semibold text-sm mb-1">TikTok</div>
-            <div class="text-white/40 text-xs">9:16 · Up to 3min</div>
-          </div>
-          <!-- Reels -->
-          <div class="opt-card platform-opt" data-val="reels" onclick="selectPlatform(this)">
-            <div class="flex justify-between items-start mb-4">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(225,48,108,0.15)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="url(#igG2)">
-                  <defs><linearGradient id="igG2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FFDC80"/><stop offset="50%" stop-color="#E1306C"/><stop offset="100%" stop-color="#833AB4"/></linearGradient></defs>
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </div>
-              <div class="check-ring"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            </div>
-            <div class="font-semibold text-sm mb-1">Instagram Reels</div>
-            <div class="text-white/40 text-xs">9:16 · Up to 90s</div>
-          </div>
-        </div>
-
-        <!-- Duration -->
-        <div class="mb-8">
-          <label class="text-sm font-semibold text-white/70 mb-3 block">Video Length</label>
-          <div class="grid grid-cols-4 gap-3">
-            <div class="opt-card duration-opt" data-val="15" onclick="selectDuration(this)">
-              <div class="text-center"><div class="text-xl font-bold mb-1" style="font-family:Syne,sans-serif">15s</div><div class="text-xs text-white/40">Quick hook</div></div>
-            </div>
-            <div class="opt-card duration-opt selected" data-val="30" onclick="selectDuration(this)">
-              <div class="text-center"><div class="text-xl font-bold mb-1" style="font-family:Syne,sans-serif">30s</div><div class="text-xs text-white/40">Sweet spot</div></div>
-            </div>
-            <div class="opt-card duration-opt" data-val="60" onclick="selectDuration(this)">
-              <div class="text-center"><div class="text-xl font-bold mb-1" style="font-family:Syne,sans-serif">60s</div><div class="text-xs text-white/40">Story time</div></div>
-            </div>
-            <div class="opt-card duration-opt" data-val="90" onclick="selectDuration(this)">
-              <div class="text-center"><div class="text-xl font-bold mb-1" style="font-family:Syne,sans-serif">90s</div><div class="text-xs text-white/40">Deep dive</div></div>
-            </div>
-          </div>
-        </div>
-
-        <button onclick="goTo(2)" class="grad-btn w-full text-white font-semibold py-4 rounded-2xl text-base">
-          Continue →
-        </button>
+      <!-- Suggestion chips -->
+      <div class="flex flex-wrap gap-2 mb-6">
+        <span class="text-xs text-white/30 self-center">Try:</span>
+        <button class="chip" onclick="setPrompt('A person running through a neon-lit city at night, energetic and fast')">🌆 Night city run</button>
+        <button class="chip" onclick="setPrompt('Peaceful ocean waves at golden hour, slow motion, cinematic')">🌊 Ocean waves</button>
+        <button class="chip" onclick="setPrompt('Someone cooking a delicious meal in a modern kitchen, close-up shots')">🍳 Cooking video</button>
+        <button class="chip" onclick="setPrompt('A motivational gym workout montage, intense and powerful')">💪 Gym motivation</button>
+        <button class="chip" onclick="setPrompt('Aerial drone footage of a green forest with fog, mystical atmosphere')">🌲 Forest drone</button>
       </div>
+
+      <!-- Generate button -->
+      <button id="generateBtn" onclick="generate()" class="grad-btn w-full text-white font-bold py-4 rounded-2xl text-lg flex items-center justify-center gap-3">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Generate Video
+      </button>
     </div>
 
-    <!-- ─── STEP 2: Topic / Script ─── -->
-    <div id="step2" class="step-panel">
-      <div class="glass rounded-3xl p-8 border border-white/8">
-        <h2 class="text-2xl font-bold mb-2">What's Your Video About?</h2>
-        <p class="text-white/50 mb-8 text-sm">Give us a topic or hook — our AI writes the rest</p>
+    <!-- Loading state -->
+    <div id="loadingBox" class="hidden text-center mt-12">
+      <div class="flex justify-center gap-2 mb-4">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <p class="text-white/50 text-sm" id="loadingLabel">Finding the perfect video…</p>
+    </div>
 
-        <!-- Topic input -->
-        <div class="mb-6">
-          <label class="text-sm font-semibold text-white/70 mb-3 block">Topic or Hook</label>
-          <div class="relative">
-            <textarea id="topicInput" rows="3" placeholder="e.g. 5 productivity hacks that changed my morning routine…" class="px-4 py-3 text-sm"></textarea>
-          </div>
-          <!-- Suggestions -->
-          <div class="flex flex-wrap gap-2 mt-3">
-            <span class="text-xs text-white/30">Try:</span>
-            <button onclick="setSuggestion('5 money habits nobody teaches you')" class="text-xs glass px-3 py-1 rounded-full text-white/50 hover:text-white/80 hover:border-violet-500/40 border border-white/8 transition-all">5 money habits nobody teaches you</button>
-            <button onclick="setSuggestion('Why I deleted all social media for 30 days')" class="text-xs glass px-3 py-1 rounded-full text-white/50 hover:text-white/80 hover:border-violet-500/40 border border-white/8 transition-all">Deleted social media 30 days</button>
-            <button onclick="setSuggestion('The morning routine that doubled my energy')" class="text-xs glass px-3 py-1 rounded-full text-white/50 hover:text-white/80 hover:border-violet-500/40 border border-white/8 transition-all">Morning routine energy hack</button>
+    <!-- Result -->
+    <div id="resultBox" class="mt-10">
+      <div class="glass rounded-3xl overflow-hidden border border-violet-500/20" style="box-shadow:0 0 60px rgba(124,58,237,0.15)">
+
+        <!-- Video player -->
+        <div class="relative bg-black" style="aspect-ratio:9/16;max-height:70vh;overflow:hidden">
+          <video id="resultVideo" autoplay muted loop playsinline
+            style="width:100%;height:100%;object-fit:cover;">
+          </video>
+          <!-- Gradient overlay bottom -->
+          <div class="absolute bottom-0 left-0 right-0 h-24" style="background:linear-gradient(to top,rgba(0,0,0,0.6),transparent)"></div>
+          <!-- Badge -->
+          <div class="absolute top-4 left-4 glass px-3 py-1 rounded-full text-xs text-white/70 flex items-center gap-2">
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse inline-block"></span>
+            AI Generated
           </div>
         </div>
 
-        <!-- Generate script button -->
-        <button id="genScriptBtn" onclick="generateScript()" class="grad-btn w-full text-white font-semibold py-3 rounded-2xl text-sm mb-6 flex items-center justify-center gap-2">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          Generate AI Script
-        </button>
-
-        <!-- Script output (hidden until generated) -->
-        <div id="scriptOutput" class="hidden mb-6">
-          <div class="flex items-center justify-between mb-3">
-            <label class="text-sm font-semibold text-white/70">Generated Script</label>
-            <button onclick="regenerateScript()" class="text-xs text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-              Regenerate
+        <!-- Actions -->
+        <div class="p-6 flex flex-col gap-3">
+          <p class="text-white/50 text-sm text-center" id="resultPromptLabel"></p>
+          <div class="flex gap-3">
+            <button onclick="regenerate()" class="flex-1 glass text-white/70 hover:text-white font-semibold py-3 rounded-xl text-sm border border-white/10 hover:border-violet-500/40 transition-all flex items-center justify-center gap-2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+              New video
+            </button>
+            <button onclick="saveAndView()" class="flex-1 grad-btn text-white font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save to library
             </button>
           </div>
-          <div id="scriptText" class="script-box text-sm"></div>
-          <div class="flex gap-2 mt-3">
-            <span class="tag tag-violet" id="scriptPlatformTag">TikTok</span>
-            <span class="tag tag-cyan"   id="scriptDurationTag">30s</span>
-            <span class="tag">AI Generated</span>
-          </div>
-        </div>
-
-        <div class="flex gap-3">
-          <button onclick="goTo(1)" class="glass text-white/60 hover:text-white font-semibold py-4 px-6 rounded-2xl text-sm transition-all border border-white/8 hover:border-white/20">
-            ← Back
-          </button>
-          <button id="step2Next" onclick="goTo(3)" class="grad-btn flex-1 text-white font-semibold py-4 rounded-2xl text-sm opacity-40 cursor-not-allowed" disabled>
-            Continue →
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ─── STEP 3: Style ─── -->
-    <div id="step3" class="step-panel">
-      <div class="glass rounded-3xl p-8 border border-white/8">
-        <h2 class="text-2xl font-bold mb-2">Set the Vibe</h2>
-        <p class="text-white/50 mb-8 text-sm">Customise the look, voice, and feel of your video</p>
-
-        <!-- Visual Style -->
-        <div class="mb-8">
-          <label class="text-sm font-semibold text-white/70 mb-4 block">Visual Style</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div class="opt-card style-opt selected" data-val="cinematic" onclick="selectOpt(this,'style-opt')">
-              <div class="text-2xl mb-2 text-center">🎬</div>
-              <div class="text-xs font-semibold text-center mb-1">Cinematic</div>
-              <div class="text-xs text-white/40 text-center">Dark, dramatic</div>
-            </div>
-            <div class="opt-card style-opt" data-val="minimal" onclick="selectOpt(this,'style-opt')">
-              <div class="text-2xl mb-2 text-center">⬜</div>
-              <div class="text-xs font-semibold text-center mb-1">Minimal</div>
-              <div class="text-xs text-white/40 text-center">Clean, bold text</div>
-            </div>
-            <div class="opt-card style-opt" data-val="neon" onclick="selectOpt(this,'style-opt')">
-              <div class="text-2xl mb-2 text-center">🌈</div>
-              <div class="text-xs font-semibold text-center mb-1">Neon Pop</div>
-              <div class="text-xs text-white/40 text-center">Vibrant, loud</div>
-            </div>
-            <div class="opt-card style-opt" data-val="vlog" onclick="selectOpt(this,'style-opt')">
-              <div class="text-2xl mb-2 text-center">📱</div>
-              <div class="text-xs font-semibold text-center mb-1">Vlog</div>
-              <div class="text-xs text-white/40 text-center">Raw, authentic</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Voice Tone -->
-        <div class="mb-8">
-          <label class="text-sm font-semibold text-white/70 mb-4 block">Voice Tone</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div class="opt-card voice-opt selected" data-val="energetic" onclick="selectOpt(this,'voice-opt')">
-              <div class="text-2xl mb-2 text-center">⚡</div>
-              <div class="text-xs font-semibold text-center">Energetic</div>
-            </div>
-            <div class="opt-card voice-opt" data-val="calm" onclick="selectOpt(this,'voice-opt')">
-              <div class="text-2xl mb-2 text-center">🌊</div>
-              <div class="text-xs font-semibold text-center">Calm</div>
-            </div>
-            <div class="opt-card voice-opt" data-val="funny" onclick="selectOpt(this,'voice-opt')">
-              <div class="text-2xl mb-2 text-center">😂</div>
-              <div class="text-xs font-semibold text-center">Funny</div>
-            </div>
-            <div class="opt-card voice-opt" data-val="serious" onclick="selectOpt(this,'voice-opt')">
-              <div class="text-2xl mb-2 text-center">🎯</div>
-              <div class="text-xs font-semibold text-center">Serious</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Music Genre -->
-        <div class="mb-8">
-          <label class="text-sm font-semibold text-white/70 mb-4 block">Music Genre</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div class="opt-card music-opt selected" data-val="hiphop" onclick="selectOpt(this,'music-opt')">
-              <div class="text-2xl mb-2 text-center">🎤</div>
-              <div class="text-xs font-semibold text-center">Hip-Hop</div>
-            </div>
-            <div class="opt-card music-opt" data-val="electronic" onclick="selectOpt(this,'music-opt')">
-              <div class="text-2xl mb-2 text-center">🎛️</div>
-              <div class="text-xs font-semibold text-center">Electronic</div>
-            </div>
-            <div class="opt-card music-opt" data-val="lofi" onclick="selectOpt(this,'music-opt')">
-              <div class="text-2xl mb-2 text-center">☕</div>
-              <div class="text-xs font-semibold text-center">Lo-Fi</div>
-            </div>
-            <div class="opt-card music-opt" data-val="cinematic" onclick="selectOpt(this,'music-opt')">
-              <div class="text-2xl mb-2 text-center">🎻</div>
-              <div class="text-xs font-semibold text-center">Cinematic</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex gap-3">
-          <button onclick="goTo(2)" class="glass text-white/60 hover:text-white font-semibold py-4 px-6 rounded-2xl text-sm transition-all border border-white/8 hover:border-white/20">
-            ← Back
-          </button>
-          <button onclick="goTo(4)" class="grad-btn flex-1 text-white font-semibold py-4 rounded-2xl text-sm">
-            Continue →
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ─── STEP 4: Generate ─── -->
-    <div id="step4" class="step-panel">
-      <div class="glass rounded-3xl p-8 border border-white/8">
-        <h2 class="text-2xl font-bold mb-2">Generate Your Video</h2>
-        <p class="text-white/50 mb-8 text-sm">Review your settings and hit generate</p>
-
-        <!-- Summary cards -->
-        <div id="summary" class="grid sm:grid-cols-2 gap-4 mb-8"></div>
-
-        <!-- Generate button -->
-        <div id="generateSection">
-          <button onclick="startGeneration()" class="grad-btn w-full text-white font-bold py-5 rounded-2xl text-base flex items-center justify-center gap-3">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Generate Video
-          </button>
-        </div>
-
-        <!-- Loading state (hidden) -->
-        <div id="loadingSection" class="hidden">
-          <div class="text-center mb-6">
-            <div class="inline-flex items-center gap-3 mb-4">
-              <!-- Waveform animation -->
-              <div class="flex items-end gap-1 h-8">
-                <div class="wave-bar h-3" style="animation:wave 1s ease-in-out infinite;animation-delay:0s"></div>
-                <div class="wave-bar h-5" style="animation:wave 1s ease-in-out infinite;animation-delay:0.15s"></div>
-                <div class="wave-bar h-8" style="animation:wave 1s ease-in-out infinite;animation-delay:0.3s"></div>
-                <div class="wave-bar h-5" style="animation:wave 1s ease-in-out infinite;animation-delay:0.45s"></div>
-                <div class="wave-bar h-3" style="animation:wave 1s ease-in-out infinite;animation-delay:0.6s"></div>
-                <div class="wave-bar h-6" style="animation:wave 1s ease-in-out infinite;animation-delay:0.75s"></div>
-                <div class="wave-bar h-4" style="animation:wave 1s ease-in-out infinite;animation-delay:0.9s"></div>
-              </div>
-            </div>
-            <div class="text-white/60 text-sm" id="loadingLabel">Analysing your script…</div>
-          </div>
-          <div class="h-2 rounded-full bg-white/8 overflow-hidden mb-3">
-            <div class="loading-bar" id="loadingBar"></div>
-          </div>
-          <div class="flex justify-between text-xs text-white/30">
-            <span>Processing</span>
-            <span id="loadingPct">0%</span>
-          </div>
-        </div>
-
-        <!-- Result card (hidden) -->
-        <div id="resultSection" class="hidden result-card">
-          <div class="border border-violet-500/30 rounded-2xl overflow-hidden" style="box-shadow:0 0 40px rgba(124,58,237,0.2)">
-            <!-- Video thumbnail mock -->
-            <div id="videoThumb" class="relative aspect-video bg-gradient-to-br from-violet-900 to-cyan-900 flex items-center justify-center overflow-hidden">
-              <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(124,58,237,0.6) 0%,rgba(6,182,212,0.4) 100%)"></div>
-              <div class="absolute inset-0" style="background-image:radial-gradient(circle at 30% 60%,rgba(255,255,255,0.08) 0%,transparent 60%)"></div>
-              <!-- Play button -->
-              <div class="relative z-10 w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-all hover:scale-110 transform">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" style="margin-left:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </div>
-              <!-- Caption overlay -->
-              <div id="captionBox" class="absolute bottom-0 left-0 right-0 z-20 px-4 pb-4 pt-8 text-center"
-                style="background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,transparent 100%);display:none">
-                <p id="captionText" class="text-white font-bold text-base leading-snug drop-shadow-lg"
-                  style="font-family:'Syne',sans-serif;text-shadow:0 2px 8px rgba(0,0,0,0.8)"></p>
-              </div>
-              <!-- Music indicator -->
-              <div id="musicBadge" class="absolute top-3 left-3 glass px-2 py-1 rounded-lg flex items-center gap-1.5 z-20" style="display:none">
-                <div class="flex items-end gap-0.5 h-3">
-                  <div style="width:2px;background:#a78bfa;border-radius:2px;animation:wave 0.8s ease-in-out infinite;animation-delay:0s;height:4px"></div>
-                  <div style="width:2px;background:#a78bfa;border-radius:2px;animation:wave 0.8s ease-in-out infinite;animation-delay:0.15s;height:8px"></div>
-                  <div style="width:2px;background:#a78bfa;border-radius:2px;animation:wave 0.8s ease-in-out infinite;animation-delay:0.3s;height:12px"></div>
-                  <div style="width:2px;background:#a78bfa;border-radius:2px;animation:wave 0.8s ease-in-out infinite;animation-delay:0.15s;height:8px"></div>
-                </div>
-                <span class="text-xs text-white/70" id="musicLabel">Music</span>
-              </div>
-              <!-- Duration badge -->
-              <div class="absolute top-3 right-3 glass px-2 py-1 rounded text-xs text-white/70" id="resultDuration">00:30</div>
-              <!-- Title -->
-              <div class="absolute" style="display:none" id="resultTitle"></div>
-            </div>
-
-            <!-- Card body -->
-            <div class="p-6 bg-[rgba(0,0,0,0.4)]">
-              <div class="flex flex-wrap gap-2 mb-4" id="resultTags"></div>
-
-              <!-- Stats row -->
-              <div class="grid grid-cols-3 gap-4 mb-6">
-                <div class="text-center glass rounded-xl py-3">
-                  <div class="text-lg font-bold grad-text" style="font-family:Syne,sans-serif" id="resultViews">—</div>
-                  <div class="text-xs text-white/40 mt-1">Predicted Views</div>
-                </div>
-                <div class="text-center glass rounded-xl py-3">
-                  <div class="text-lg font-bold grad-text" style="font-family:Syne,sans-serif" id="resultScore">—</div>
-                  <div class="text-xs text-white/40 mt-1">Viral Score</div>
-                </div>
-                <div class="text-center glass rounded-xl py-3">
-                  <div class="text-lg font-bold grad-text" style="font-family:Syne,sans-serif" id="resultEngagement">—</div>
-                  <div class="text-xs text-white/40 mt-1">Eng. Rate</div>
-                </div>
-              </div>
-
-              <!-- Caption suggestion -->
-              <div class="glass rounded-xl p-4 mb-6">
-                <div class="text-xs text-white/40 mb-2 uppercase tracking-wide">Suggested Caption</div>
-                <div class="text-sm text-white/80" id="resultCaption"></div>
-              </div>
-
-              <!-- Volymkontroll -->
-              <div class="glass rounded-xl px-4 py-3 mb-4 flex items-center gap-3">
-                <button onclick="toggleMute()" id="muteBtn" class="text-white/60 hover:text-white transition-colors">
-                  <svg id="muteIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                </button>
-                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.35"
-                  oninput="setVolume(this.value)"
-                  style="flex:1;accent-color:#7c3aed;cursor:pointer;">
-                <span class="text-xs text-white/40">Musik</span>
-                <button onclick="refreshVideo()" class="text-white/60 hover:text-white transition-colors ml-2" title="Byt video">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-                </button>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex gap-3">
-                <button onclick="downloadVideo()" class="grad-btn flex-1 text-white font-semibold py-3 rounded-xl text-sm flex items-center justify-center gap-2">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  Export Video
-                </button>
-                <button onclick="createNew()" class="glass text-white/70 hover:text-white font-semibold py-3 px-5 rounded-xl text-sm transition-all border border-white/8 hover:border-white/20">
-                  + New Video
-                </button>
-                <a href="videos.html" class="glass text-white/70 hover:text-white font-semibold py-3 px-5 rounded-xl text-sm transition-all border border-white/8 hover:border-white/20 flex items-center">
-                  My Videos
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-4" id="backBtn4">
-          <button onclick="goTo(3)" class="glass text-white/60 hover:text-white font-semibold py-3 px-6 rounded-2xl text-sm transition-all border border-white/8 hover:border-white/20">
-            ← Back
+          <button onclick="createNew()" class="text-white/30 hover:text-white/60 text-sm transition-colors">
+            ← Start over
           </button>
         </div>
       </div>
@@ -595,455 +192,128 @@
 </main>
 
 <script>
-  // ── Musik per genre ──
-  const musicTracks = {
-    hiphop:     'https://assets.mixkit.co/music/preview/mixkit-rap-beat-379.mp3',
-    electronic: 'https://assets.mixkit.co/music/preview/mixkit-driving-ambition-32.mp3',
-    lofi:       'https://assets.mixkit.co/music/preview/mixkit-life-is-a-dream-837.mp3',
-    cinematic:  'https://assets.mixkit.co/music/preview/mixkit-cinematic-mystery-suspense-681.mp3',
-  };
-  const musicNames = { hiphop:'Hip-Hop Beat', electronic:'Electronic', lofi:'Lo-Fi Chill', cinematic:'Cinematic' };
-
-  let audioEl = null;
-  let captionTimer = null;
-
-  function startMusic(genre) {
-    if (audioEl) { audioEl.pause(); audioEl = null; }
-    const src = musicTracks[genre] || musicTracks.hiphop;
-    audioEl = new Audio(src);
-    audioEl.volume = 0.35;
-    audioEl.loop = true;
-    audioEl.play().catch(() => {});
-    document.getElementById('musicBadge').style.display = 'flex';
-    document.getElementById('musicLabel').textContent = musicNames[genre] || 'Music';
-  }
-
-  function startCaptions(script) {
-    const box  = document.getElementById('captionBox');
-    const text = document.getElementById('captionText');
-    // Extrahera bara textrader (hoppa över [SECTION]-rubriker och tomma rader)
-    const lines = script.split('\n')
-      .map(l => l.trim())
-      .filter(l => l && !l.startsWith('[') && !l.startsWith('Point'));
-    if (!lines.length) return;
-    box.style.display = 'block';
-    let i = 0;
-    function showNext() {
-      text.style.opacity = '0';
-      text.style.transform = 'translateY(8px)';
-      text.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-      setTimeout(() => {
-        text.textContent = lines[i % lines.length];
-        text.style.opacity = '1';
-        text.style.transform = 'translateY(0)';
-        i++;
-      }, 400);
-    }
-    showNext();
-    captionTimer = setInterval(showNext, 3500);
-  }
-
-  function stopMediaAndCaptions() {
-    if (audioEl) { audioEl.pause(); audioEl = null; }
-    if (captionTimer) { clearInterval(captionTimer); captionTimer = null; }
-    document.getElementById('captionBox').style.display = 'none';
-    document.getElementById('musicBadge').style.display = 'none';
-  }
-
-  // ── Pexels API (gratis nyckel från pexels.com/api) ──
   const PEXELS_API_KEY = 'qR5KMsVNxwK926d1Brq0SCEY2LBlyhn7uWJkVxSS7A6taALSedlK0sO1';
 
-  async function fetchPexelsVideo(topic) {
-    try {
-      const res = await fetch(
-        `https://api.pexels.com/videos/search?query=${encodeURIComponent(topic)}&per_page=5&orientation=portrait`,
-        { headers: { Authorization: PEXELS_API_KEY } }
-      );
-      const data = await res.json();
-      if (!data.videos || !data.videos.length) return null;
-      const video = data.videos[0];
-      const file = video.video_files.find(f => f.width <= 720 && f.height >= 720)
-                || video.video_files[0];
-      return file ? file.link : null;
-    } catch (e) { return null; }
-  }
+  let currentVideoUrl = '';
+  let currentPrompt   = '';
 
-  // ── State ──
-  const state = {
-    step: 1,
-    platform: 'tiktok',
-    duration: '30',
-    topic: '',
-    script: '',
-    style: 'cinematic',
-    voice: 'energetic',
-    music: 'hiphop',
-  };
-
-  // ── AI Script Generator ──
-  const hooks = [
-    t => `"Nobody tells you THIS about ${t}… until now."`,
-    t => `"I tried ${t} for 30 days. Here's what actually happened."`,
-    t => `"The uncomfortable truth about ${t} that nobody talks about."`,
-    t => `"Stop doing ${t} wrong. Here's the right way."`,
-    t => `"${t} changed my life — and it can change yours too."`,
-    t => `"Why 99% of people get ${t} completely wrong."`,
-    t => `"If you're not doing this with ${t}, you're leaving money on the table."`,
-    t => `"POV: You finally understand ${t}."`,
+  const loadingMessages = [
+    'Finding the perfect video…',
+    'Analysing your description…',
+    'Searching visual library…',
+    'Matching your vision…',
+    'Almost ready…',
   ];
-  const bodies = {
-    money: [
-      `Mistake #1: Spending before saving. Flip it — pay yourself first, always.\n\nMistake #2: One income stream. The wealthy have 7 on average.\n\nMistake #3: Ignoring compound interest. $100/month at 20 = $1M at 65.\n\nMistake #4: Buying liabilities and calling them assets. Your car costs you.\n\nThe fix? Start with just ONE of these today.`,
-      `Truth #1: Your salary is not your wealth — your savings rate is.\n\nTruth #2: The best investment is the one you actually start.\n\nTruth #3: Rich people buy time. Poor people sell it.\n\nTruth #4: Financial freedom is a skill. And skills can be learned.`,
-    ],
-    productivity: [
-      `Step 1: Time-block your day the night before. 15 minutes saves 2 hours.\n\nStep 2: Kill notifications. Your phone is a distraction machine.\n\nStep 3: The 2-minute rule — if it takes less than 2 minutes, do it NOW.\n\nStep 4: Single-task. Multitasking is a myth that destroys focus.\n\nResult: You get more done in 4 hours than most do in 8.`,
-      `The problem isn't time — it's energy management.\n\nMorning: deep work only. No emails, no meetings.\n\nAfternoon: creative tasks and collaboration.\n\nEvening: review, plan tomorrow, disconnect.\n\nOne week of this and you'll never go back.`,
-    ],
-    fitness: [
-      `Week 1: Every workout felt impossible. I almost quit.\n\nWeek 4: Something clicked. Energy levels went through the roof.\n\nWeek 8: People started asking what I was doing differently.\n\nWeek 12: I'm a different person. Not just physically.\n\nThe secret? Consistency over intensity. Every. Single. Time.`,
-      `Myth #1: You need the gym. You don't — you need movement.\n\nMyth #2: More hours = more results. Quality beats quantity.\n\nMyth #3: You need to suffer. You need to be consistent.\n\nThe truth: 20 minutes a day beats 2 hours once a week.`,
-    ],
-    mindset: [
-      `Shift #1: Stop saying "I can't" — say "How can I?"\n\nShift #2: Your environment shapes you. Upgrade it.\n\nShift #3: The people around you are the average you become.\n\nShift #4: Discomfort is growth wearing a mask.\n\nOne mindset shift can change the entire trajectory of your life.`,
-      `Hard truth: Your beliefs are programming from your past.\n\nThe good news: programming can be rewritten.\n\nStep 1: Catch the negative thought.\nStep 2: Question it — is this actually true?\nStep 3: Replace it with a growth-focused alternative.\n\nDo this 100 times and watch your life transform.`,
-    ],
-    default: [
-      `Point 1: Most people approach {topic} completely backwards.\n\nThe conventional wisdom says X. But the data shows Y.\n\nPoint 2: The people who win at {topic} do one thing differently.\n\nThey focus on the 20% that drives 80% of results.\n\nPoint 3: Here's your action step for today.\n\nStart small. Stay consistent. Trust the process.`,
-      `What nobody tells you: {topic} isn't about talent.\n\nIt's about systems. The right system beats motivation every time.\n\nHere's the 3-step system that actually works:\n1. Start before you're ready\n2. Track your progress\n3. Adjust and repeat\n\nSimple. Not easy. Worth it.`,
-    ],
-  };
-  const ctas = [
-    `Follow for more game-changing content like this. Drop a 🔥 if this hit.`,
-    `Save this — your future self will thank you. And follow for more. 📌`,
-    `Which point surprised you most? Comment below 👇 Follow for daily value.`,
-    `Share this with someone who needs to hear it today. 💯`,
-    `If this helped, follow. New value drops every day. 🚀`,
-  ];
+  let loadingTimer = null;
 
-  function generateSmartScript(topic, platform, duration) {
-    const lc = topic.toLowerCase();
-    const hook = hooks[Math.floor(Math.random() * hooks.length)](topic);
-    let bodyArr = bodies.default;
-    if (lc.match(/money|wealth|invest|financ|rich|income/)) bodyArr = bodies.money;
-    else if (lc.match(/product|focus|work|habit|routine|morning|energy/)) bodyArr = bodies.productivity;
-    else if (lc.match(/fit|gym|workout|exercise|health|diet|weight/)) bodyArr = bodies.fitness;
-    else if (lc.match(/mind|think|mental|belief|motivat|success|goal/)) bodyArr = bodies.mindset;
-    const body = bodyArr[Math.floor(Math.random() * bodyArr.length)].replace(/\{topic\}/g, topic);
-    const cta  = ctas[Math.floor(Math.random() * ctas.length)];
-    const durLabel = parseInt(duration) <= 30 ? '0:00-0:03' : '0:00-0:05';
-    const endSec = parseInt(duration);
-    const ctaStart = endSec - 7;
-    return `[HOOK - ${durLabel}]\n${hook}\n\n[BODY]\n${body}\n\n[CTA - 0:${ctaStart}-0:${endSec}]\n"${cta}"`;
+  function setPrompt(text) {
+    document.getElementById('promptInput').value = text;
+    document.getElementById('promptInput').focus();
   }
 
-  // ── Navigation ──
-  function goTo(step) {
-    if (step === 3 && !state.script) return;
-
-    document.getElementById('step' + state.step).classList.remove('active');
-    state.step = step;
-    document.getElementById('step' + step).classList.add('active');
-
-    updateIndicator();
-    if (step === 4) buildSummary();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  async function fetchVideo(query) {
+    const res = await fetch(
+      `https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=10&orientation=portrait`,
+      { headers: { Authorization: PEXELS_API_KEY } }
+    );
+    const data = await res.json();
+    if (!data.videos || !data.videos.length) return null;
+    // Pick a random video from top 10 results
+    const video = data.videos[Math.floor(Math.random() * data.videos.length)];
+    const file  = video.video_files.find(f => f.width <= 720 && f.height >= 720)
+               || video.video_files.find(f => f.quality === 'sd')
+               || video.video_files[0];
+    return file ? file.link : null;
   }
 
-  function updateIndicator() {
-    for (let i = 1; i <= 4; i++) {
-      const dot = document.getElementById('dot' + i);
-      const lbl = document.getElementById('lbl' + i);
-      dot.classList.remove('active','done','inactive');
-      if (i < state.step)      { dot.classList.add('done');     dot.textContent = '✓'; lbl.style.color='rgba(255,255,255,0.4)'; }
-      else if (i === state.step){ dot.classList.add('active');   dot.textContent = i;   lbl.style.color='rgba(167,139,250,0.9)'; }
-      else                      { dot.classList.add('inactive'); dot.textContent = i;   lbl.style.color='rgba(255,255,255,0.3)'; }
-    }
-    for (let i = 1; i <= 3; i++) {
-      const con = document.getElementById('con' + i);
-      con.classList.remove('done','inactive');
-      con.classList.add(i < state.step ? 'done' : 'inactive');
-    }
-  }
-
-  // ── Step 1 ──
-  function selectPlatform(el) {
-    document.querySelectorAll('.platform-opt').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    state.platform = el.dataset.val;
-  }
-  function selectDuration(el) {
-    document.querySelectorAll('.duration-opt').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    state.duration = el.dataset.val;
-  }
-
-  // ── Step 2 ──
-  function setSuggestion(text) {
-    document.getElementById('topicInput').value = text;
-    state.topic = text;
-  }
-
-  const scriptLabels = { tiktok:'TikTok', youtube:'YouTube Shorts', reels:'Instagram Reels' };
-
-  function generateScript() {
-    const topic = document.getElementById('topicInput').value.trim();
-    if (!topic) {
-      document.getElementById('topicInput').focus();
-      document.getElementById('topicInput').style.borderColor = '#ef4444';
-      setTimeout(() => document.getElementById('topicInput').style.borderColor = '', 1500);
+  async function generate() {
+    const prompt = document.getElementById('promptInput').value.trim();
+    if (!prompt) {
+      document.getElementById('promptInput').style.borderColor = '#ef4444';
+      document.getElementById('promptInput').focus();
+      setTimeout(() => document.getElementById('promptInput').style.borderColor = '', 1500);
       return;
     }
-    state.topic = topic;
+    currentPrompt = prompt;
+    showLoading(true);
 
-    const btn = document.getElementById('genScriptBtn');
-    btn.innerHTML = '<svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Generating…';
-    btn.disabled = true;
-
-    setTimeout(() => {
-      const chosen = generateSmartScript(topic, state.platform, state.duration);
-      state.script = chosen;
-      typewriterScript(chosen);
-
-      document.getElementById('scriptPlatformTag').textContent = scriptLabels[state.platform] || 'TikTok';
-      document.getElementById('scriptDurationTag').textContent = state.duration + 's';
-
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Generate AI Script';
-      btn.disabled = false;
-
-      const next = document.getElementById('step2Next');
-      next.disabled = false;
-      next.classList.remove('opacity-40','cursor-not-allowed');
-    }, 1600);
+    try {
+      const url = await fetchVideo(prompt);
+      if (url) {
+        currentVideoUrl = url;
+        showResult(url, prompt);
+      } else {
+        showLoading(false);
+        alert('No video found for that description. Try different words!');
+      }
+    } catch (e) {
+      showLoading(false);
+      alert('Something went wrong. Check your internet connection and try again.');
+    }
   }
 
-  function typewriterScript(text) {
-    const out = document.getElementById('scriptOutput');
-    const el  = document.getElementById('scriptText');
-    out.classList.remove('hidden');
-    el.textContent = '';
-    let i = 0;
-    const cursor = document.createElement('span');
-    cursor.className = 'cursor';
-    el.appendChild(cursor);
-    const iv = setInterval(() => {
-      if (i >= text.length) { clearInterval(iv); cursor.remove(); return; }
-      cursor.before(text[i++]);
-    }, 12);
+  async function regenerate() {
+    showLoading(true);
+    document.getElementById('resultBox').classList.remove('show');
+    try {
+      const url = await fetchVideo(currentPrompt);
+      if (url) { currentVideoUrl = url; showResult(url, currentPrompt); }
+      else { showLoading(false); }
+    } catch(e) { showLoading(false); }
   }
 
-  function regenerateScript() {
-    const chosen = generateSmartScript(state.topic || 'success', state.platform, state.duration);
-    state.script = chosen;
-    typewriterScript(chosen);
-  }
-
-  // ── Step 3 ──
-  function selectOpt(el, cls) {
-    document.querySelectorAll('.' + cls).forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    const key = cls.split('-')[0];
-    state[key] = el.dataset.val;
-  }
-
-  // ── Step 4 ──
-  const platformLabels = { tiktok:'TikTok', youtube:'YouTube Shorts', reels:'Instagram Reels' };
-  const styleLabels    = { cinematic:'🎬 Cinematic', minimal:'⬜ Minimal', neon:'🌈 Neon Pop', vlog:'📱 Vlog' };
-  const voiceLabels    = { energetic:'⚡ Energetic', calm:'🌊 Calm', funny:'😂 Funny', serious:'🎯 Serious' };
-  const musicLabels    = { hiphop:'🎤 Hip-Hop', electronic:'🎛️ Electronic', lofi:'☕ Lo-Fi', cinematic:'🎻 Cinematic' };
-
-  function buildSummary() {
-    const s = state;
-    document.getElementById('summary').innerHTML = `
-      <div class="glass rounded-xl p-4">
-        <div class="text-xs text-white/40 mb-2 uppercase tracking-wide">Platform & Length</div>
-        <div class="font-semibold">${platformLabels[s.platform]}</div>
-        <div class="text-white/50 text-sm">${s.duration} seconds</div>
-      </div>
-      <div class="glass rounded-xl p-4">
-        <div class="text-xs text-white/40 mb-2 uppercase tracking-wide">Topic</div>
-        <div class="font-semibold text-sm leading-snug">${s.topic.length > 50 ? s.topic.slice(0,50)+'…' : s.topic}</div>
-      </div>
-      <div class="glass rounded-xl p-4">
-        <div class="text-xs text-white/40 mb-2 uppercase tracking-wide">Visual Style</div>
-        <div class="font-semibold">${styleLabels[s.style]}</div>
-      </div>
-      <div class="glass rounded-xl p-4">
-        <div class="text-xs text-white/40 mb-2 uppercase tracking-wide">Voice & Music</div>
-        <div class="font-semibold text-sm">${voiceLabels[s.voice]}</div>
-        <div class="text-white/50 text-sm">${musicLabels[s.music]}</div>
-      </div>
-    `;
-  }
-
-  const loadingLabels = [
-    'Analysing your script…',
-    'Generating visual sequences…',
-    'Syncing audio waveform…',
-    'Applying ' + '' + ' style…',
-    'Optimising for algorithm…',
-    'Rendering final frames…',
-    'Almost there…',
-  ];
-
-  async function startGeneration() {
-    // Starta musik direkt vid knapptryckning (måste ske inom user-gesture)
-    startMusic(state.music);
-
-    document.getElementById('generateSection').classList.add('hidden');
-    document.getElementById('backBtn4').classList.add('hidden');
-    document.getElementById('loadingSection').classList.remove('hidden');
-
-    const bar   = document.getElementById('loadingBar');
-    const pct   = document.getElementById('loadingPct');
-    const label = document.getElementById('loadingLabel');
-
-    bar.style.width = '0%';
-
-    const steps = [0,15,30,55,72,88,95,100];
-    const msgs  = [
-      'Analysing your script…',
-      'Generating visual sequences…',
-      'Syncing audio waveform…',
-      `Applying ${styleLabels[state.style]} style…`,
-      'Optimising for the algorithm…',
-      'Rendering final frames…',
-      'Almost there…',
-      'Done!',
-    ];
-
-    // Hämta video från Pexels parallellt med loading-animationen
-    const videoPromise = fetchPexelsVideo(state.topic);
-
-    let idx = 0;
-    await new Promise(resolve => {
-      const iv = setInterval(() => {
-        if (idx >= steps.length) { clearInterval(iv); resolve(); return; }
-        bar.style.width = steps[idx] + '%';
-        pct.textContent = steps[idx] + '%';
-        label.textContent = msgs[idx] || msgs[msgs.length-1];
+  function showLoading(on) {
+    const btn  = document.getElementById('generateBtn');
+    const load = document.getElementById('loadingBox');
+    btn.disabled = on;
+    load.classList.toggle('hidden', !on);
+    if (on) {
+      let idx = 0;
+      loadingTimer = setInterval(() => {
+        document.getElementById('loadingLabel').textContent = loadingMessages[idx % loadingMessages.length];
         idx++;
-      }, 480);
-    });
-
-    const videoUrl = await videoPromise;
-    showResult(videoUrl);
+      }, 900);
+    } else {
+      clearInterval(loadingTimer);
+    }
   }
 
-  function showResult(videoUrl) {
-    document.getElementById('loadingSection').classList.add('hidden');
-    const rs = document.getElementById('resultSection');
-    rs.classList.remove('hidden');
-    rs.style.animation = 'none';
-    rs.offsetHeight;
-    rs.style.animation = 'bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards';
+  function showResult(url, prompt) {
+    showLoading(false);
+    document.getElementById('resultVideo').src = url;
+    document.getElementById('resultPromptLabel').textContent = `"${prompt.length > 80 ? prompt.slice(0,80)+'…' : prompt}"`;
+    const box = document.getElementById('resultBox');
+    box.classList.add('show');
+    box.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
 
-    const s = state;
-    const pLabel = platformLabels[s.platform];
-    const mins   = Math.floor(parseInt(s.duration)/60);
-    const secs   = parseInt(s.duration) % 60;
-
-    // Stoppa eventuell tidigare musik/captions
-    stopMediaAndCaptions();
-
-    // Visa riktig video (utan att radera captions och musikbadge)
-    const thumbEl = document.getElementById('videoThumb');
-    const oldVid = thumbEl.querySelector('video');
-    if (oldVid) oldVid.remove();
-    if (videoUrl) {
-      const vid = document.createElement('video');
-      vid.src = videoUrl;
-      vid.autoplay = true;
-      vid.muted = true;
-      vid.loop = true;
-      vid.setAttribute('playsinline', '');
-      vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;';
-      thumbEl.insertBefore(vid, thumbEl.firstChild);
-    }
-
-    document.getElementById('resultTitle').textContent = s.topic.length > 40 ? s.topic.slice(0,40)+'…' : s.topic;
-    document.getElementById('resultDuration').textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
-
-    // Starta captions
-    if (s.script) startCaptions(s.script);
-
-    const views = (Math.floor(Math.random()*900+100)).toLocaleString() + 'K–' + (Math.floor(Math.random()*5+1)) + 'M';
-    const score = Math.floor(Math.random()*15+82) + '/100';
-    const eng   = (Math.random()*3+4).toFixed(1) + '%';
-
-    // Spara till localStorage så videon syns på My Videos
-    saveVideoToLibrary({
+  function saveAndView() {
+    const saved = JSON.parse(localStorage.getItem('viralai_videos') || '[]');
+    saved.unshift({
       id: Date.now(),
-      title: s.topic,
-      platform: s.platform,
-      duration: s.duration + 's',
-      style: styleLabels[s.style],
-      voice: voiceLabels[s.voice],
-      videoUrl: videoUrl || '',
-      views: '0', likes: '0', comments: '0', shares: '0',
-      score: parseInt(score),
+      title: currentPrompt.length > 60 ? currentPrompt.slice(0,60)+'…' : currentPrompt,
+      platform: 'tiktok',
+      duration: '30s',
+      style: 'AI Generated',
+      voice: '—',
+      videoUrl: currentVideoUrl,
+      views:'0', likes:'0', comments:'0', shares:'0',
+      score: Math.floor(Math.random()*15+82),
       status: 'published',
-      caption: `${s.topic} 🔥 #${s.platform} #viral #fyp`,
+      caption: currentPrompt + ' #viral #ai #fyp',
       daysAgo: 0,
+      gradient: 'from-violet-900 to-cyan-900',
+      accent: '#7c3aed',
     });
-
-    document.getElementById('resultViews').textContent = views;
-    document.getElementById('resultScore').textContent = score;
-    document.getElementById('resultEngagement').textContent = eng;
-
-    document.getElementById('resultCaption').textContent =
-      `${s.topic} 🔥 This changed everything for me. Save this before it's gone. #${s.platform} #viral #trending #fyp #lifehack`;
-
-    document.getElementById('resultTags').innerHTML = `
-      <span class="tag tag-violet">${pLabel}</span>
-      <span class="tag tag-cyan">${s.duration}s</span>
-      <span class="tag">${styleLabels[s.style]}</span>
-      <span class="tag">${voiceLabels[s.voice]}</span>
-      <span class="tag tag-pink">Ready to Export</span>
-    `;
+    localStorage.setItem('viralai_videos', JSON.stringify(saved));
+    window.location.href = 'videos.html';
   }
 
-  function downloadVideo() {
-    const btn = event.currentTarget;
-    btn.innerHTML = '✓ Exported!';
-    btn.style.background = 'linear-gradient(135deg,#059669,#10b981)';
-    setTimeout(() => {
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export Video';
-      btn.style.background = '';
-    }, 2000);
-  }
-
-  function createNew() { stopMediaAndCaptions(); window.location.reload(); }
-
-  function setVolume(v) {
-    if (audioEl) audioEl.volume = parseFloat(v);
-  }
-
-  function toggleMute() {
-    if (!audioEl) return;
-    audioEl.muted = !audioEl.muted;
-    document.getElementById('muteIcon').style.opacity = audioEl.muted ? '0.3' : '1';
-  }
-
-  async function refreshVideo() {
-    const thumbEl = document.getElementById('videoThumb');
-    const oldVid = thumbEl.querySelector('video');
-    if (oldVid) oldVid.remove();
-    const newUrl = await fetchPexelsVideo(state.topic);
-    if (newUrl) {
-      const vid = document.createElement('video');
-      vid.src = newUrl;
-      vid.autoplay = true; vid.muted = true; vid.loop = true;
-      vid.setAttribute('playsinline', '');
-      vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;';
-      thumbEl.insertBefore(vid, thumbEl.firstChild);
-    }
-  }
-
-  function saveVideoToLibrary(video) {
-    const existing = JSON.parse(localStorage.getItem('viralai_videos') || '[]');
-    existing.unshift(video); // lägg till senast skapade först
-    localStorage.setItem('viralai_videos', JSON.stringify(existing));
+  function createNew() {
+    document.getElementById('resultBox').classList.remove('show');
+    document.getElementById('promptInput').value = '';
+    document.getElementById('promptInput').focus();
+    window.scrollTo({ top:0, behavior:'smooth' });
   }
 </script>
 </body>
