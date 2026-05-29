@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ViralAI – Create</title>
+  <title>ViralAI – Create Your Viral Video</title>
+  <meta name="description" content="Create AI-powered short videos for TikTok, YouTube Shorts and Instagram Reels in seconds." />
+  <meta name="theme-color" content="#7c3aed" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c3aed'/><text y='.9em' font-size='70' x='15'>V</text></svg>" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -677,73 +680,62 @@
     music: 'hiphop',
   };
 
-  const scripts = {
-    default: `[HOOK - 0:00-0:03]
-"Nobody tells you THIS about {topic}…"
-
-[BODY - 0:04-0:22]
-Point 1: Start with the unexpected truth that stops the scroll.
-"Most people think they know, but here's what actually happens..."
-
-Point 2: Build tension with a relatable moment.
-"I used to make this exact mistake — until I discovered..."
-
-Point 3: Deliver the value bomb.
-"The real secret is this: [specific, actionable tip]"
-
-[CTA - 0:23-0:30]
-"Follow for more hidden gems like this. Drop a 🔥 if this helped."`,
-    money: `[HOOK - 0:00-0:03]
-"5 money habits rich people have that schools never taught you 💰"
-
-[BODY - 0:04-0:22]
-Habit 1: Pay yourself first — before bills, before fun, before anything.
-
-Habit 2: Invest in assets, not liabilities. Your car costs you. Stocks earn you.
-
-Habit 3: Track every dollar. What gets measured gets managed.
-
-Habit 4: Build multiple income streams. One job = one point of failure.
-
-Habit 5: Compound interest is your best friend. Start at 20 not 40.
-
-[CTA - 0:23-0:30]
-"Save this for your future self 📌 Follow for daily wealth tips."`,
-    social: `[HOOK - 0:00-0:03]
-"I deleted all social media for 30 days. Here's what nobody warned me about…"
-
-[BODY - 0:04-0:22]
-Week 1: I was anxious, restless, reaching for my phone every 10 minutes.
-
-Week 2: Something shifted. I started reading. Cooking. Actually sleeping.
-
-Week 3: My focus came back. Ideas started flowing again.
-
-Week 4: I realised I was HAPPY — not performatively happy, actually happy.
-
-The twist? Coming back felt worse than leaving.
-
-[CTA - 0:23-0:30]
-"Try 7 days first. Thank me later. 👇 What would you miss most?"`,
-    morning: `[HOOK - 0:00-0:03]
-"The 5am morning routine that doubled my energy. No, seriously."
-
-[BODY - 0:04-0:22]
-5:00am — Wake before your phone. No alarm snooze allowed.
-
-5:05am — Glass of cold water + 10 deep breaths outside.
-
-5:15am — 20-minute walk. No podcasts. Just you and your thoughts.
-
-5:35am — Journal 3 things: grateful for, focused on today, releasing.
-
-5:50am — Protein breakfast. Fuel the machine before the chaos hits.
-
-6:00am — You're already winning while most people are still asleep.
-
-[CTA - 0:23-0:30]
-"Which step are you starting with? Drop it below 👇"`,
+  // ── AI Script Generator ──
+  const hooks = [
+    t => `"Nobody tells you THIS about ${t}… until now."`,
+    t => `"I tried ${t} for 30 days. Here's what actually happened."`,
+    t => `"The uncomfortable truth about ${t} that nobody talks about."`,
+    t => `"Stop doing ${t} wrong. Here's the right way."`,
+    t => `"${t} changed my life — and it can change yours too."`,
+    t => `"Why 99% of people get ${t} completely wrong."`,
+    t => `"If you're not doing this with ${t}, you're leaving money on the table."`,
+    t => `"POV: You finally understand ${t}."`,
+  ];
+  const bodies = {
+    money: [
+      `Mistake #1: Spending before saving. Flip it — pay yourself first, always.\n\nMistake #2: One income stream. The wealthy have 7 on average.\n\nMistake #3: Ignoring compound interest. $100/month at 20 = $1M at 65.\n\nMistake #4: Buying liabilities and calling them assets. Your car costs you.\n\nThe fix? Start with just ONE of these today.`,
+      `Truth #1: Your salary is not your wealth — your savings rate is.\n\nTruth #2: The best investment is the one you actually start.\n\nTruth #3: Rich people buy time. Poor people sell it.\n\nTruth #4: Financial freedom is a skill. And skills can be learned.`,
+    ],
+    productivity: [
+      `Step 1: Time-block your day the night before. 15 minutes saves 2 hours.\n\nStep 2: Kill notifications. Your phone is a distraction machine.\n\nStep 3: The 2-minute rule — if it takes less than 2 minutes, do it NOW.\n\nStep 4: Single-task. Multitasking is a myth that destroys focus.\n\nResult: You get more done in 4 hours than most do in 8.`,
+      `The problem isn't time — it's energy management.\n\nMorning: deep work only. No emails, no meetings.\n\nAfternoon: creative tasks and collaboration.\n\nEvening: review, plan tomorrow, disconnect.\n\nOne week of this and you'll never go back.`,
+    ],
+    fitness: [
+      `Week 1: Every workout felt impossible. I almost quit.\n\nWeek 4: Something clicked. Energy levels went through the roof.\n\nWeek 8: People started asking what I was doing differently.\n\nWeek 12: I'm a different person. Not just physically.\n\nThe secret? Consistency over intensity. Every. Single. Time.`,
+      `Myth #1: You need the gym. You don't — you need movement.\n\nMyth #2: More hours = more results. Quality beats quantity.\n\nMyth #3: You need to suffer. You need to be consistent.\n\nThe truth: 20 minutes a day beats 2 hours once a week.`,
+    ],
+    mindset: [
+      `Shift #1: Stop saying "I can't" — say "How can I?"\n\nShift #2: Your environment shapes you. Upgrade it.\n\nShift #3: The people around you are the average you become.\n\nShift #4: Discomfort is growth wearing a mask.\n\nOne mindset shift can change the entire trajectory of your life.`,
+      `Hard truth: Your beliefs are programming from your past.\n\nThe good news: programming can be rewritten.\n\nStep 1: Catch the negative thought.\nStep 2: Question it — is this actually true?\nStep 3: Replace it with a growth-focused alternative.\n\nDo this 100 times and watch your life transform.`,
+    ],
+    default: [
+      `Point 1: Most people approach {topic} completely backwards.\n\nThe conventional wisdom says X. But the data shows Y.\n\nPoint 2: The people who win at {topic} do one thing differently.\n\nThey focus on the 20% that drives 80% of results.\n\nPoint 3: Here's your action step for today.\n\nStart small. Stay consistent. Trust the process.`,
+      `What nobody tells you: {topic} isn't about talent.\n\nIt's about systems. The right system beats motivation every time.\n\nHere's the 3-step system that actually works:\n1. Start before you're ready\n2. Track your progress\n3. Adjust and repeat\n\nSimple. Not easy. Worth it.`,
+    ],
   };
+  const ctas = [
+    `Follow for more game-changing content like this. Drop a 🔥 if this hit.`,
+    `Save this — your future self will thank you. And follow for more. 📌`,
+    `Which point surprised you most? Comment below 👇 Follow for daily value.`,
+    `Share this with someone who needs to hear it today. 💯`,
+    `If this helped, follow. New value drops every day. 🚀`,
+  ];
+
+  function generateSmartScript(topic, platform, duration) {
+    const lc = topic.toLowerCase();
+    const hook = hooks[Math.floor(Math.random() * hooks.length)](topic);
+    let bodyArr = bodies.default;
+    if (lc.match(/money|wealth|invest|financ|rich|income/)) bodyArr = bodies.money;
+    else if (lc.match(/product|focus|work|habit|routine|morning|energy/)) bodyArr = bodies.productivity;
+    else if (lc.match(/fit|gym|workout|exercise|health|diet|weight/)) bodyArr = bodies.fitness;
+    else if (lc.match(/mind|think|mental|belief|motivat|success|goal/)) bodyArr = bodies.mindset;
+    const body = bodyArr[Math.floor(Math.random() * bodyArr.length)].replace(/\{topic\}/g, topic);
+    const cta  = ctas[Math.floor(Math.random() * ctas.length)];
+    const durLabel = parseInt(duration) <= 30 ? '0:00-0:03' : '0:00-0:05';
+    const endSec = parseInt(duration);
+    const ctaStart = endSec - 7;
+    return `[HOOK - ${durLabel}]\n${hook}\n\n[BODY]\n${body}\n\n[CTA - 0:${ctaStart}-0:${endSec}]\n"${cta}"`;
+  }
 
   // ── Navigation ──
   function goTo(step) {
@@ -809,14 +801,7 @@ The twist? Coming back felt worse than leaving.
     btn.disabled = true;
 
     setTimeout(() => {
-      // Pick a script based on keywords
-      let chosen = scripts.default;
-      const lc = topic.toLowerCase();
-      if (lc.includes('money') || lc.includes('wealth') || lc.includes('finance') || lc.includes('habit')) chosen = scripts.money;
-      else if (lc.includes('social') || lc.includes('delete') || lc.includes('quit')) chosen = scripts.social;
-      else if (lc.includes('morning') || lc.includes('routine') || lc.includes('energy') || lc.includes('produc')) chosen = scripts.morning;
-      else chosen = scripts.default.replace('{topic}', topic);
-
+      const chosen = generateSmartScript(topic, state.platform, state.duration);
       state.script = chosen;
       typewriterScript(chosen);
 
@@ -848,8 +833,7 @@ The twist? Coming back felt worse than leaving.
   }
 
   function regenerateScript() {
-    const variants = [scripts.money, scripts.social, scripts.morning];
-    const chosen = variants[Math.floor(Math.random() * variants.length)];
+    const chosen = generateSmartScript(state.topic || 'success', state.platform, state.duration);
     state.script = chosen;
     typewriterScript(chosen);
   }
